@@ -1,24 +1,40 @@
-import { useState } from 'react'
+import { useState } from "react";
+import BarcodeScanner from "./components/BarcodeScanner";
 
 function App() {
-  const [contador, setContador] = useState(0)
+  const [codigo, setCodigo] = useState("");
+
+  async function consultarProduto(codigoLido) {
+    setCodigo(codigoLido);
+
+    console.log("Código lido:", codigoLido);
+
+    try {
+      const response = await fetch(
+        `/api/produto/${codigoLido}`
+      );
+
+      const dados = await response.json();
+
+      console.log(dados);
+    } catch (erro) {
+      console.error(erro);
+    }
+  }
 
   return (
-    <div style={{
-      textAlign: 'center',
-      marginTop: '50px'
-    }}>
-      <h1>Meu Primeiro PWA</h1>
+    <div>
+      <h1>Consulta de Produtos</h1>
 
-      <h2>{contador}</h2>
+      <BarcodeScanner
+        onScan={consultarProduto}
+      />
 
-      <button
-        onClick={() => setContador(contador + 1)}
-      >
-        Incrementar
-      </button>
+      <h2>Código:</h2>
+
+      <p>{codigo}</p>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
