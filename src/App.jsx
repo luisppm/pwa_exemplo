@@ -7,6 +7,28 @@ function App() {
   const [produto, setProduto] = useState(null);
   const [ultimoCodigo, setUltimoCodigo] = useState("");
 
+  const [produtoPendente, setProdutoPendente] = useState(null);
+  const [itens, setItens] = useState([]);
+
+  function confirmarProduto() {
+  setItens((anterior) => [
+    ...anterior,
+    {
+      gtin: produtoPendente.gtin,
+      descricao: produtoPendente.description,
+      marca: produtoPendente.brand?.name,
+      categoria: produtoPendente.category?.description,
+      dataHora: new Date().toLocaleString()
+    }
+  ]);
+
+  setProdutoPendente(null);
+}
+
+function cancelarProduto() {
+  setProdutoPendente(null);
+}
+
   async function onScan(codigoLido) {
     if (!codigoLido) return;
 
@@ -21,7 +43,8 @@ function App() {
     try {
       const dados = await consultarProduto(codigoLido);
 
-      setProduto(dados);
+      // setProduto(dados);
+      setProdutoPendente(dados);
     } catch (err) {
       console.error(err);
       setProduto(null);
@@ -44,16 +67,56 @@ function App() {
 
       <p>{codigo}</p>
 
-      {produto && (
-        <>
-          <h2>Produto</h2>
+      {produtoPendente && (
+  <div
+    style={{
+      border: "1px solid #ccc",
+      padding: "20px",
+      marginTop: "20px",
+      borderRadius: "10px"
+    }}
+  >
+    <h2>Confirmar Produto</h2>
 
-          <pre>
-            {JSON.stringify(produto, null, 2)}
-          </pre>
-        </>
-      )}
+    <img
+      src={produtoPendente.thumbnail}
+      alt={produtoPendente.description}
+      width="150"
+    />
+
+    <p>
+      <strong>Descrição:</strong>
+      {produtoPendente.description}
+    </p>
+
+    <p>
+      <strong>GTIN:</strong>
+      {produtoPendente.gtin}
+    </p>
+
+    <p>
+      <strong>Marca:</strong>
+      {produtoPendente.brand?.name}
+    </p>
+
+    <button
+      onClick={confirmarProduto}
+      style={{
+        marginRight: "10px"
+      }}
+    >
+      Confirmar
+    </button>
+
+    <button
+      onClick={cancelarProduto}
+    >
+      Cancelar
+    </button>
+  </div>
+)}
     </div>
+    
   );
 }
 
